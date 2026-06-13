@@ -1,0 +1,70 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:   # يسمح بالتشغيل اليدوي من GitHub
+
+jobs:
+  build-apk:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. استنسخ المستودع
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. إعداد Node.js
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. تثبيت التبعيات
+      - name: Install Dependencies
+        run: npm install
+
+      # 4. إعداد Java 17
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 5. إعداد Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      # 6. إضافة منصة Android
+      - name: Add Capacitor Android Platform
+        run: npx cap add android
+
+      # 7. نسخ الـ Web Assets إلى Android
+      - name: Copy Web Assets
+        run: npx cap copy android
+
+      # 8. منح صلاحيات Gradlew
+      - name: Make Gradlew Executable
+        run: chmod +x android/gradlew
+
+      # 9. بناء APK
+      - name: Build Debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      # 10. رفع APK كـ artifact للتنزيل
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quran-app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      # 11. عرض مسار APK في الـ logs
+      - name: Show APK Info
+        run: |
+          echo "✅ APK built successfully!"
+          ls -lh android/app/build/outputs/apk/debug/
