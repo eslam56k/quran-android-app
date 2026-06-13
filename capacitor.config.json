@@ -1,0 +1,20 @@
+{
+  "appId": "com.azhareon.quran",
+  "appName": "المصحف الرقمي",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#FDFBF5"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#FDFBF5",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    }
+  }
+}
